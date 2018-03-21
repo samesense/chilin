@@ -98,6 +98,10 @@ class ChiLinConfig(ConfigParser):
             return list(zip(self.control_raws, self.control_targets))
         else:
             return self.control_pairs_pe
+    @property
+    def has_multiple_controls(self):
+        """Return true if multiple unique control files exist."""
+        return len( set(self.control_raws) ) > 1
 
     @property
     def sample_pairs(self):
@@ -221,6 +225,21 @@ class ChiLinConfig(ConfigParser):
             return self.control_single_targets
         else:
             return self.control_pair_targets["reps"]
+
+    @property
+    def control_targets_for_merged_bam(self):
+        if self.pe:
+            return self.control_pair_targets["reps"]
+        # raw control files can be the same across replicates
+        # do not include the same raw file when merging control bams
+        # here raw bam can appear multiple times in self.control_raws
+        # all self.control_targets have unique ids
+        ls, seen = [], {}
+        for raw_bam, bam in zip(self.control_raws, self.control_targets):
+            if not raw_bam in seen:
+                ls.append(bam)
+                seen[raw_bam] = True
+        return ls
 
     @property
     def control_single_targets(self):

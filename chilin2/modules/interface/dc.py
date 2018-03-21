@@ -103,13 +103,14 @@ def merge_bams(workflow, conf):   ## merge input and chip bam
 
     # merging step will be skipped if control sample does not exist
     # So be careful to check whether there are control samples before using `_control.bam`
-    if len(conf.control_targets) > 1:
+    # this has been updated so duplicate controls are not counted more than once in the merge
+    if conf.has_multiple_controls:
         merge_bams_control = merge_bams_treat.clone
-        merge_bams_control.input = [target + ".bam" for target in conf.control_targets]
+        merge_bams_control.input = [target + ".bam" for target in conf.control_targets_for_merged_bam]
         merge_bams_control.output = {"merged": conf.prefix + "_control.bam"}
         merge_bams_control.param = {"bams": " ".join(merge_bams_control.input)}
         attach_back(workflow, merge_bams_control)
-    elif len(conf.control_targets) == 1:
+    elif len(conf.control_targets):
         attach_back(workflow, make_link_command(conf.control_targets[0] + ".bam", conf.prefix + "_control.bam"))
 
 
