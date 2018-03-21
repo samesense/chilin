@@ -108,3 +108,7 @@ full documentation: http://cistrome.org/chilin
 
 github wiki: https://github.com/cfce/chilin/wiki
 
+Perry changes
+===============
+
+The initial version expected each control fq file to be unique. I have instances where the same control file is used for different replicate IPs. This might introduce a problem when the control files are merged, depending on how duplicate reads are handled. In the worst case, more merging is done than required. I've altered the merging steps so that only unique control files are merged.
